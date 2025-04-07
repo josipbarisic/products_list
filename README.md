@@ -1,4 +1,4 @@
-# italist_mobile_assignment
+# products_list
 
 Test assignment
 
