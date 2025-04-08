@@ -5,21 +5,24 @@ import 'package:italist_mobile_assignment/presentation/home/providers/paginated_
 import 'package:italist_mobile_assignment/presentation/home/providers/product_filter_provider.dart';
 import 'package:italist_mobile_assignment/presentation/home/widgets/filter_bottom_sheet.dart';
 import 'package:italist_mobile_assignment/presentation/home/widgets/filter_chips.dart';
-import 'package:italist_mobile_assignment/presentation/home/widgets/product_list_item.dart';
-import 'package:italist_mobile_assignment/presentation/home/widgets/product_list_loading_item.dart';
+import 'package:italist_mobile_assignment/presentation/home/widgets/product_grid_item.dart';
+import 'package:italist_mobile_assignment/presentation/home/widgets/product_grid_loading_item.dart';
 
 class HomePage extends HookConsumerWidget {
   const HomePage({super.key});
 
   static const _pageSize = 20;
+  static const double _gridPadding = 8.0;
+  static const double _gridSpacing = 8.0;
+  static const int _crossAxisCount = 2;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final searchController = useTextEditingController();
     final firstPageAsyncValue = ref.watch(paginatedProductsProvider(1));
+    final scrollController = useScrollController();
 
     // Listen to filter changes to reset scroll position (optional but good UX)
-    final scrollController = useScrollController();
     ref.listen(productFilterNotifierProvider, (prev, next) {
       final bool filtersChanged = prev?.searchQuery != next.searchQuery ||
           prev?.brand != next.brand ||
@@ -59,7 +62,7 @@ class HomePage extends HookConsumerWidget {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(_gridPadding),
             child: TextField(
               controller: searchController,
               decoration: InputDecoration(
@@ -68,39 +71,49 @@ class HomePage extends HookConsumerWidget {
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.0),
                 ),
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.clear),
-                  onPressed: () {
-                    searchController.clear();
-                    ref.read(productFilterNotifierProvider.notifier).updateSearchQuery('');
-                  },
-                ),
+                suffixIcon: searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          searchController.clear();
+                          ref.read(productFilterNotifierProvider.notifier).updateSearchQuery('');
+                        },
+                      )
+                    : null,
               ),
             ),
           ),
           const FilterChips(),
+          const SizedBox(height: _gridPadding / 2), // Add some space before the grid
           Expanded(
-            // Use ListView.builder based on total pages from first page response
+            // Use Expanded + GridView.builder
             child: firstPageAsyncValue.when(
               data: (firstPageData) {
-                // Calculate total items based on total pages
                 final totalItems = firstPageData.totalItems;
                 final totalPages = firstPageData.totalPages;
-                // Check if there are actually more pages to load
                 final bool hasMorePages = totalItems > 0 && firstPageData.currentPage < totalPages;
-                // Add 1 for the bottom loading indicator only if there are more pages
+                // Add 1 item slot for the loading indicator if needed
                 final itemCount = totalItems + (hasMorePages ? 1 : 0);
 
                 if (totalItems == 0) {
                   return const Center(child: Text('No products found.'));
                 }
 
-                return ListView.builder(
+                return GridView.builder(
                   controller: scrollController,
+                  padding: const EdgeInsets.all(_gridPadding),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: _crossAxisCount, // 2 columns
+                    crossAxisSpacing: _gridSpacing, // Horizontal spacing
+                    mainAxisSpacing: _gridSpacing, // Vertical spacing
+                    childAspectRatio: 0.55, // Adjust aspect ratio (width / height) for desired look
+                  ),
                   itemCount: itemCount,
                   itemBuilder: (context, index) {
-                    // Check if this is the slot for the loading indicator
+                    // Check if it's the loading indicator slot
                     if (hasMorePages && index == totalItems) {
+                      // For GridView, the loading indicator needs to fit in a cell
+                      // or be handled outside. Here, we place it in the last cell.
                       return const Center(
                         child: Padding(
                           padding: EdgeInsets.all(16.0),
@@ -118,14 +131,31 @@ class HomePage extends HookConsumerWidget {
 
                     return pageAsyncValue.when(
                       data: (pageData) {
+                        // Handle potential index out of bounds if data changes unexpectedly
+                        if (indexInPage >= pageData.items.length) {
+                          // Return an empty container or a placeholder
+                          return const SizedBox.shrink();
+                        }
                         final product = pageData.items[indexInPage];
-                        return ProductListItem(product: product);
+                        // Use ProductGridItem instead of ProductListItem
+                        return ProductGridItem(product: product);
                       },
-                      // Show placeholder for items in loading pages
-                      loading: () => const ProductListLoadingItem(),
-                      error: (err, stack) => ListTile(
-                        title: Text('Error loading item...',
-                            style: TextStyle(color: Theme.of(context).colorScheme.error)),
+                      // Show placeholder grid item for loading pages
+                      loading: () => const ProductGridLoadingItem(),
+                      error: (err, stack) => Card(
+                        color: Theme.of(context).colorScheme.errorContainer,
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              'Error',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onErrorContainer,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
                       ),
                     );
                   },

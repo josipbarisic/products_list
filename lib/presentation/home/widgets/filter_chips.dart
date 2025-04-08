@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:italist_mobile_assignment/presentation/home/providers/product_filter_provider.dart';
-import 'package:italist_mobile_assignment/presentation/home/widgets/filter_chip.dart';
+import 'package:italist_mobile_assignment/presentation/home/widgets/custom_filter_chip.dart';
 
 class FilterChips extends HookConsumerWidget {
   const FilterChips({super.key});

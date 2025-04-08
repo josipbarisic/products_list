@@ -12,7 +12,7 @@ class FilterBottomSheet extends HookConsumerWidget {
     final filter = ref.watch(productFilterNotifierProvider);
 
     // List of available brands, categories, and genders. This would normally come from an endpoint.
-    final brands = ['Lo Decor', 'Michael Kors', 'Nike', 'Adidas', 'Gucci', 'Prada', 'Calvin Klein'];
+    final brands = ['Lo Decor', 'Michael Kors', 'Nike', 'Adidas', 'Gucci', 'Lo Spazio Jewelry', 'Calvin Klein'];
     final categories = ['Home Décor', 'Accessories', 'Clothing', 'Shoes', 'Bags'];
     final genders = ['male', 'female', 'unisex'];
 
