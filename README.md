@@ -73,7 +73,7 @@ The app uses Riverpod for state management with the following key providers:
 
 1. Clone the repository
    ```bash
-   git clone https://github.com/josipbarisic/product_list.git
+   git clone https://github.com/josipbarisic/products_list.git
    cd product_list
    ```
 
