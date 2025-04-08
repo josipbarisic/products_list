@@ -1,4 +1,4 @@
-name: italist_mobile_assignment
+name: product_list
 description: "Test assignment"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.

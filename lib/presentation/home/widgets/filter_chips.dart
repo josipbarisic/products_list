@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:italist_mobile_assignment/presentation/home/providers/product_filter_provider.dart';
-import 'package:italist_mobile_assignment/presentation/home/widgets/custom_filter_chip.dart';
+import 'package:product_list/presentation/home/providers/product_filter_provider.dart';
+import 'package:product_list/presentation/home/widgets/custom_filter_chip.dart';
 
 /// A horizontal row displaying currently active filters as chips.
 ///

@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:italist_mobile_assignment/data/models/product/product_model.dart';
-import 'package:italist_mobile_assignment/data/repositories/products_repository/products_repository.dart';
+import 'package:product_list/data/models/product/product_model.dart';
+import 'package:product_list/data/repositories/products_repository/products_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'products_provider.g.dart';

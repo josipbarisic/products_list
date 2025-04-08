@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:italist_mobile_assignment/data/models/product_filter/product_filter.dart';
+import 'package:product_list/data/models/product_filter/product_filter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'product_filter_provider.g.dart';

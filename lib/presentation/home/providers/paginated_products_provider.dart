@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:italist_mobile_assignment/data/models/paginated_response/paginated_response.dart';
-import 'package:italist_mobile_assignment/data/models/product/product_model.dart';
-import 'package:italist_mobile_assignment/presentation/home/providers/product_filter_provider.dart';
-import 'package:italist_mobile_assignment/presentation/home/providers/products_provider.dart';
+import 'package:product_list/data/models/paginated_response/paginated_response.dart';
+import 'package:product_list/data/models/product/product_model.dart';
+import 'package:product_list/presentation/home/providers/product_filter_provider.dart';
+import 'package:product_list/presentation/home/providers/products_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'paginated_products_provider.g.dart';

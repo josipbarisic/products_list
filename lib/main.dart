@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:italist_mobile_assignment/presentation/home/home_page.dart';
+import 'package:product_list/presentation/home/home_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

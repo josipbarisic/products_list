@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:italist_mobile_assignment/data/models/product/product_model.dart';
-import 'package:italist_mobile_assignment/presentation/home/providers/paginated_products_provider.dart';
-import 'package:italist_mobile_assignment/presentation/home/providers/product_filter_provider.dart';
-import 'package:italist_mobile_assignment/presentation/home/providers/products_provider.dart';
+import 'package:product_list/data/models/product/product_model.dart';
+import 'package:product_list/presentation/home/providers/paginated_products_provider.dart';
+import 'package:product_list/presentation/home/providers/product_filter_provider.dart';
+import 'package:product_list/presentation/home/providers/products_provider.dart';
 
 // Helper function to create test products
 ProductModel createTestProduct({

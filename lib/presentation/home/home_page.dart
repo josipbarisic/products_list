@@ -3,13 +3,13 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:italist_mobile_assignment/data/models/product/product_model.dart';
-import 'package:italist_mobile_assignment/presentation/home/providers/paginated_products_provider.dart';
-import 'package:italist_mobile_assignment/presentation/home/providers/product_filter_provider.dart';
-import 'package:italist_mobile_assignment/presentation/home/widgets/filter_bottom_sheet.dart';
-import 'package:italist_mobile_assignment/presentation/home/widgets/filter_chips.dart';
-import 'package:italist_mobile_assignment/presentation/home/widgets/product_grid_item.dart';
-import 'package:italist_mobile_assignment/presentation/home/widgets/product_grid_loading_item.dart';
+import 'package:product_list/data/models/product/product_model.dart';
+import 'package:product_list/presentation/home/providers/paginated_products_provider.dart';
+import 'package:product_list/presentation/home/providers/product_filter_provider.dart';
+import 'package:product_list/presentation/home/widgets/filter_bottom_sheet.dart';
+import 'package:product_list/presentation/home/widgets/filter_chips.dart';
+import 'package:product_list/presentation/home/widgets/product_grid_item.dart';
+import 'package:product_list/presentation/home/widgets/product_grid_loading_item.dart';
 
 /// The main page displaying the list of products with search and filter capabilities.
 class HomePage extends HookConsumerWidget {

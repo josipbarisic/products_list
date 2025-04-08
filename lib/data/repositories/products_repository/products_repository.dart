@@ -3,8 +3,8 @@ import 'dart:developer';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:italist_mobile_assignment/core/services/local_storage/local_storage_service.dart';
-import 'package:italist_mobile_assignment/data/models/product/product_model.dart';
+import 'package:product_list/core/services/local_storage/local_storage_service.dart';
+import 'package:product_list/data/models/product/product_model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'products_repository.g.dart';

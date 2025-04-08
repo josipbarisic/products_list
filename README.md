@@ -1,6 +1,7 @@
-# ITalist Mobile - E-commerce Product App
+# Test assignment E-commerce Product App
 
-A modern Flutter e-commerce application showcasing product browsing, filtering, and search capabilities using Riverpod for state management.
+A modern Flutter e-commerce application showcasing product browsing, filtering, and search
+capabilities using Riverpod for state management.
 
 ![Flutter Version](https://img.shields.io/badge/flutter-%3E%3D3.0.0-blue.svg)
 ![Dart Version](https://img.shields.io/badge/dart-%3E%3D3.0.0-blue.svg)
@@ -19,15 +20,18 @@ A modern Flutter e-commerce application showcasing product browsing, filtering, 
 This application follows a structured architecture separating concerns:
 
 ### Data Layer
+
 - **Models**: Strongly typed data models with Freezed
 - **Repositories**: Data access abstraction
 - **Data Sources**: Remote/local data providers
 
 ### Logic Layer
+
 - **Providers**: Riverpod-powered state management
 - **Services**: Business logic and processing
 
 ### Presentation Layer
+
 - **Pages**: Main application screens
 - **Widgets**: Reusable UI components
 - **State Management**: Reactive UI with Riverpod code-gen
@@ -69,8 +73,8 @@ The app uses Riverpod for state management with the following key providers:
 
 1. Clone the repository
    ```bash
-   git clone https://github.com/username/italist_mobile_assignment.git
-   cd italist_mobile_assignment
+   git clone https://github.com/josipbarisic/product_list.git
+   cd product_list
    ```
 
 2. Install dependencies
@@ -92,6 +96,7 @@ The application includes comprehensive testing:
 - **Integration Tests**: End-to-end testing (planned)
 
 Run tests with:
+
 ```bash
 flutter test
 ```

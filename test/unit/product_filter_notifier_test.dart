@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:italist_mobile_assignment/presentation/home/providers/product_filter_provider.dart';
+import 'package:product_list/presentation/home/providers/product_filter_provider.dart';
 
 void main() {
   group('ProductFilterNotifier Tests', () {

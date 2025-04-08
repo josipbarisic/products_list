@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:italist_mobile_assignment/core/constants/colors.dart';
+import 'package:product_list/core/constants/colors.dart';
 import 'package:shimmer/shimmer.dart';
 
 /// A placeholder widget displayed in the product grid while product data is loading.

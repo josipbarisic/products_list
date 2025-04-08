@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:italist_mobile_assignment/core/constants/colors.dart';
-import 'package:italist_mobile_assignment/data/models/product/product_model.dart';
+import 'package:product_list/core/constants/colors.dart';
+import 'package:product_list/data/models/product/product_model.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
