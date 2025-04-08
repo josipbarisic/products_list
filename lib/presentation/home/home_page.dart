@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:italist_mobile_assignment/data/models/product/product_model.dart';
 import 'package:italist_mobile_assignment/presentation/home/providers/paginated_products_provider.dart';
 import 'package:italist_mobile_assignment/presentation/home/providers/product_filter_provider.dart';
 import 'package:italist_mobile_assignment/presentation/home/widgets/filter_bottom_sheet.dart';
@@ -13,9 +14,6 @@ import 'package:italist_mobile_assignment/presentation/home/widgets/product_grid
 /// The main page displaying the list of products with search and filter capabilities.
 class HomePage extends HookConsumerWidget {
   const HomePage({super.key});
-
-  /// Number of items to fetch per page.
-  static const _pageSize = 20;
 
   /// Padding around the grid.
   static const double _gridPadding = 8.0;
@@ -29,6 +27,9 @@ class HomePage extends HookConsumerWidget {
   /// Aspect ratio for grid items (width / height).
   static const double _childAspectRatio = 0.55;
 
+  /// Distance from bottom that triggers loading of the next page
+  static const double _scrollThreshold = 200.0;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // --- Hooks --- //
@@ -37,9 +38,78 @@ class HomePage extends HookConsumerWidget {
     // Trigger rebuilds when search text changes to show/hide clear button
     final searchQuery = useState(searchController.text);
 
+    // Track current page, products, and loading state
+    final currentPage = useState(1);
+    final products = useState<List<ProductModel>>([]);
+    final isLoadingMore = useState(false);
+    final hasMorePages = useState(true);
+    final totalItemCount = useState(0);
+
     // --- Providers --- //
     final filterNotifier = ref.read(productFilterNotifierProvider.notifier);
-    final pageTracker = useState(1); // Start with the first page
+
+    // --- Load first page --- //
+    final firstPageData = ref.watch(paginatedProductsProvider(1));
+
+    // --- Define loadNextPage function before it's used ---
+    void loadNextPage() async {
+      if (isLoadingMore.value || !hasMorePages.value) return;
+
+      isLoadingMore.value = true;
+      final nextPage = currentPage.value + 1;
+
+      try {
+        final nextPageData = await ref.read(paginatedProductsProvider(nextPage).future);
+
+        // On successful load, update state
+        if (nextPageData.items.isNotEmpty) {
+          products.value = [...products.value, ...nextPageData.items];
+          currentPage.value = nextPage;
+          hasMorePages.value = nextPage < nextPageData.totalPages;
+        } else {
+          hasMorePages.value = false;
+        }
+      } catch (e) {
+        log('Error loading next page: $e');
+        // Show error if needed
+      } finally {
+        isLoadingMore.value = false;
+      }
+    }
+
+    // Handle initial page data
+    useEffect(() {
+      void handleFirstPage() {
+        firstPageData.whenData((data) {
+          products.value = data.items;
+          hasMorePages.value = data.currentPage < data.totalPages;
+          totalItemCount.value = data.totalItems;
+        });
+      }
+
+      handleFirstPage();
+      return null;
+    }, [firstPageData]);
+
+    // --- Handle scroll position --- //
+    useEffect(() {
+      void onScroll() {
+        if (scrollController.hasClients) {
+          final maxScroll = scrollController.position.maxScrollExtent;
+          final currentScroll = scrollController.position.pixels;
+
+          // If we're close to the bottom and not already loading more
+          if (maxScroll - currentScroll <= _scrollThreshold &&
+              !isLoadingMore.value &&
+              hasMorePages.value) {
+            loadNextPage();
+          }
+        }
+      }
+
+      scrollController.addListener(onScroll);
+      return () => scrollController.removeListener(onScroll);
+    }, []);
 
     // --- Effects --- //
     // Effect to update search query in the provider when text changes (debounced internally)
@@ -53,7 +123,7 @@ class HomePage extends HookConsumerWidget {
       return () => searchController.removeListener(listener);
     }, [searchController, filterNotifier]); // Dependencies
 
-    // Effect to scroll to top when filters change
+    // Effect to reset state when filters change
     ref.listen(productFilterNotifierProvider, (prev, next) {
       // Check if filters actually changed (excluding search, handled separately)
       final bool filtersChanged = prev?.brand != next.brand ||
@@ -62,16 +132,18 @@ class HomePage extends HookConsumerWidget {
           prev?.minPrice != next.minPrice ||
           prev?.maxPrice != next.maxPrice;
 
-      if (filtersChanged && scrollController.hasClients) {
-        scrollController.jumpTo(0);
+      if (filtersChanged) {
+        // Reset pagination state
+        currentPage.value = 1;
+        isLoadingMore.value = false;
+        hasMorePages.value = true;
+
+        // Scroll to top if possible
+        if (scrollController.hasClients) {
+          scrollController.jumpTo(0);
+        }
       }
     });
-
-    void updatePageTracker() {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        pageTracker.value++;
-      });
-    }
 
     final theme = Theme.of(context);
 
@@ -149,93 +221,56 @@ class HomePage extends HookConsumerWidget {
 
           // --- Product Grid ---
           Expanded(
-            child: ref.watch(paginatedProductsProvider(pageTracker.value)).when(
-                  data: (firstPageData) {
-                    final loadedItems = firstPageData.loadedItems;
-                    final totalItems = firstPageData.totalItems;
-                    final totalPages = firstPageData.totalPages;
-                    final currentPage = firstPageData.currentPage;
-                    log('Total items: $totalItems, Total pages: $totalPages, Current page: $currentPage vs pageTracker: ${pageTracker.value}');
+            child: firstPageData.when(
+              data: (_) {
+                // Handle empty state
+                if (totalItemCount.value == 0) {
+                  return const Center(child: Text('No products found.'));
+                }
 
-                    // Handle empty state
-                    if (totalItems == 0) {
-                      return const Center(child: Text('No products found.'));
-                    }
-                    final bool hasMorePages = totalItems > 0 && currentPage < totalPages;
+                // Calculate the itemCount based on products + loading indicator if needed
+                final itemCount = products.value.length + (hasMorePages.value ? 1 : 0);
 
-                    return GridView.builder(
-                      controller: scrollController,
-                      padding: const EdgeInsets.all(_gridPadding),
-                      cacheExtent: loadedItems.toDouble(),
-                      shrinkWrap: true,
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: _crossAxisCount,
-                        crossAxisSpacing: _gridSpacing,
-                        mainAxisSpacing: _gridSpacing,
-                        childAspectRatio: _childAspectRatio,
-                      ),
-                      itemBuilder: (context, index) {
-                        // --- Loading Indicator Logic ---
-                        // If this is the last item slot and there are more pages, show loader
-                        if (hasMorePages && index == loadedItems) {
-                          // Trigger loading of the next page
-                          // Increment page state to load more items
-                          updatePageTracker();
-                          return const Center(
-                            child: Padding(
-                              padding: EdgeInsets.all(16.0),
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            ),
-                          );
-                        }
-
-                        // --- Product Item Logic ---
-                        // Calculate which page this index falls into
-                        final page = index ~/ _pageSize + 1;
-                        // Calculate the item's index within its specific page
-                        final indexInPage = index % _pageSize;
-
-                        // Watch the provider for the specific page needed for this item
-                        return ref.watch(paginatedProductsProvider(page)).when(
-                              data: (pageData) {
-                                // Safety check: Ensure item exists in the loaded page data
-                                if (indexInPage >= pageData.items.length) {
-                                  // Return an empty placeholder if data is inconsistent
-                                  return const SizedBox.shrink();
-                                }
-                                final product = pageData.items[indexInPage];
-                                return ProductGridItem(product: product);
-                              },
-                              // Show loading placeholder while the specific page loads
-                              loading: () => const ProductGridLoadingItem(),
-                              // Show error placeholder if the specific page fails to load
-                              error: (error, stack) => Card(
-                                color: theme.colorScheme.errorContainer,
-                                child: Center(
-                                  child: Padding(
-                                    // Make padding const
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text(
-                                      'Error loading item', // Generic error for item
-                                      style: TextStyle(
-                                        color: theme.colorScheme.onErrorContainer,
-                                        fontSize: 12,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            );
-                      },
-                    );
-                  },
-                  loading: () => const Center(child: CircularProgressIndicator()),
-                  error: (error, stack) => Center(
-                    child: Text('Error loading products: ${error.toString()}'),
+                return GridView.builder(
+                  controller: scrollController,
+                  padding: const EdgeInsets.all(_gridPadding),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: _crossAxisCount,
+                    crossAxisSpacing: _gridSpacing,
+                    mainAxisSpacing: _gridSpacing,
+                    childAspectRatio: _childAspectRatio,
                   ),
-                ),
+                  itemCount: itemCount,
+                  itemBuilder: (context, index) {
+                    // If we're at the last item and there are more pages, show loader
+                    if (index == products.value.length && hasMorePages.value) {
+                      // We'll show a loading indicator at the bottom
+                      return ProductGridLoadingItem();
+                    }
+
+                    // Regular product item
+                    if (index < products.value.length) {
+                      final product = products.value[index];
+                      return ProductGridItem(product: product);
+                    }
+
+                    // Fallback (shouldn't be reached)
+                    return const SizedBox.shrink();
+                  },
+                );
+              },
+
+              // Initial loading state
+              loading: () => const Center(child: CircularProgressIndicator()),
+
+              // Error state
+              error: (error, stack) {
+                log('Error loading products', error: error, stackTrace: stack);
+                return Center(
+                  child: Text('Error loading products: ${error.toString()}'),
+                );
+              },
+            ),
           ),
         ],
       ),
