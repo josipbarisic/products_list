@@ -1,12 +1,14 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:italist_mobile_assignment/data/models/product_filter/product_filter.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'product_filter_provider.g.dart';
 
-// Filter provider
+/// Provides the current filter state ([ProductFilter]) for products.
+///
+/// This notifier holds the user-selected filters (search query, brand, etc.)
+/// and includes debouncing logic for the search query.
 @Riverpod(keepAlive: true)
 class ProductFilterNotifier extends _$ProductFilterNotifier {
   Timer? _debounceTimer;
@@ -16,47 +18,47 @@ class ProductFilterNotifier extends _$ProductFilterNotifier {
     ref.onDispose(() {
       _debounceTimer?.cancel();
     });
+    // Initialize with default (empty) filters.
     return const ProductFilter();
   }
 
+  /// Updates the search query with debouncing.
+  /// 
+  /// Waits for 500ms after the last call before updating the state.
   void updateSearchQuery(String query) {
-    log('Debounce query update: "$query"');
+    /// If the query is the same as the current state, return.
+    if (query == state.searchQuery) return;
+
     // Cancel the previous timer if it exists
     _debounceTimer?.cancel();
     // Start a new timer
     _debounceTimer = Timer(const Duration(milliseconds: 500), () {
-      log('Debounce triggered. Updating state with query: "$query"');
       state = state.copyWithSearchQuery(query);
-      // NOTE: We no longer reset pagination here as pagination is handled by the UI/fetch provider
     });
   }
 
+  /// Updates the brand filter.
   void updateBrand(String? brand) {
     state = state.copyWithBrand(brand);
-    // No resetPagination needed
   }
 
+  /// Updates the category filter.
   void updateCategory(String? category) {
     state = state.copyWithCategory(category);
-    // No resetPagination needed
   }
 
+  /// Updates the gender filter.
   void updateGender(String? gender) {
     state = state.copyWithGender(gender);
-    // No resetPagination needed
   }
 
+  /// Updates the price range filter.
   void updatePriceRange(double? minPrice, double? maxPrice) {
     state = state.copyWithPriceRange(minPrice: minPrice, maxPrice: maxPrice);
-    // No resetPagination needed
   }
 
+  /// Resets all filters to their default values.
   void clearFilters() {
     state = const ProductFilter();
-    // No resetPagination needed
   }
-
-// Removed loadMore and resetPagination methods as they are no longer relevant
-// void loadMore() { ... }
-// void resetPagination() { ... }
 }

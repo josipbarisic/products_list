@@ -1,12 +1,12 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'filtered_products_provider.dart';
+part of 'paginated_products_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$filteredProductsHash() => r'fe5e6d8ce23bb282fb17a6839d1b6782a2f38cbf';
+String _$paginatedProductsHash() => r'a31367ab9ad0b8268f7d74d017b61f2758f9d9d5';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -29,30 +29,31 @@ class _SystemHash {
   }
 }
 
-/// See also [filteredProducts].
-@ProviderFor(filteredProducts)
-const filteredProductsProvider = FilteredProductsFamily();
+/// See also [paginatedProducts].
+@ProviderFor(paginatedProducts)
+const paginatedProductsProvider = PaginatedProductsFamily();
 
-/// See also [filteredProducts].
-class FilteredProductsFamily extends Family<AsyncValue<List<ProductModel>>> {
-  /// See also [filteredProducts].
-  const FilteredProductsFamily();
+/// See also [paginatedProducts].
+class PaginatedProductsFamily
+    extends Family<AsyncValue<PaginatedResponse<ProductModel>>> {
+  /// See also [paginatedProducts].
+  const PaginatedProductsFamily();
 
-  /// See also [filteredProducts].
-  FilteredProductsProvider call(
-    int pageKey,
+  /// See also [paginatedProducts].
+  PaginatedProductsProvider call(
+    int page,
   ) {
-    return FilteredProductsProvider(
-      pageKey,
+    return PaginatedProductsProvider(
+      page,
     );
   }
 
   @override
-  FilteredProductsProvider getProviderOverride(
-    covariant FilteredProductsProvider provider,
+  PaginatedProductsProvider getProviderOverride(
+    covariant PaginatedProductsProvider provider,
   ) {
     return call(
-      provider.pageKey,
+      provider.page,
     );
   }
 
@@ -68,76 +69,79 @@ class FilteredProductsFamily extends Family<AsyncValue<List<ProductModel>>> {
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'filteredProductsProvider';
+  String? get name => r'paginatedProductsProvider';
 }
 
-/// See also [filteredProducts].
-class FilteredProductsProvider
-    extends AutoDisposeFutureProvider<List<ProductModel>> {
-  /// See also [filteredProducts].
-  FilteredProductsProvider(
-    int pageKey,
+/// See also [paginatedProducts].
+class PaginatedProductsProvider
+    extends AutoDisposeFutureProvider<PaginatedResponse<ProductModel>> {
+  /// See also [paginatedProducts].
+  PaginatedProductsProvider(
+    int page,
   ) : this._internal(
-          (ref) => filteredProducts(
-            ref as FilteredProductsRef,
-            pageKey,
+          (ref) => paginatedProducts(
+            ref as PaginatedProductsRef,
+            page,
           ),
-          from: filteredProductsProvider,
-          name: r'filteredProductsProvider',
+          from: paginatedProductsProvider,
+          name: r'paginatedProductsProvider',
           debugGetCreateSourceHash:
               const bool.fromEnvironment('dart.vm.product')
                   ? null
-                  : _$filteredProductsHash,
-          dependencies: FilteredProductsFamily._dependencies,
+                  : _$paginatedProductsHash,
+          dependencies: PaginatedProductsFamily._dependencies,
           allTransitiveDependencies:
-              FilteredProductsFamily._allTransitiveDependencies,
-          pageKey: pageKey,
+              PaginatedProductsFamily._allTransitiveDependencies,
+          page: page,
         );
 
-  FilteredProductsProvider._internal(
+  PaginatedProductsProvider._internal(
     super._createNotifier, {
     required super.name,
     required super.dependencies,
     required super.allTransitiveDependencies,
     required super.debugGetCreateSourceHash,
     required super.from,
-    required this.pageKey,
+    required this.page,
   }) : super.internal();
 
-  final int pageKey;
+  final int page;
 
   @override
   Override overrideWith(
-    FutureOr<List<ProductModel>> Function(FilteredProductsRef provider) create,
+    FutureOr<PaginatedResponse<ProductModel>> Function(
+            PaginatedProductsRef provider)
+        create,
   ) {
     return ProviderOverride(
       origin: this,
-      override: FilteredProductsProvider._internal(
-        (ref) => create(ref as FilteredProductsRef),
+      override: PaginatedProductsProvider._internal(
+        (ref) => create(ref as PaginatedProductsRef),
         from: from,
         name: null,
         dependencies: null,
         allTransitiveDependencies: null,
         debugGetCreateSourceHash: null,
-        pageKey: pageKey,
+        page: page,
       ),
     );
   }
 
   @override
-  AutoDisposeFutureProviderElement<List<ProductModel>> createElement() {
-    return _FilteredProductsProviderElement(this);
+  AutoDisposeFutureProviderElement<PaginatedResponse<ProductModel>>
+      createElement() {
+    return _PaginatedProductsProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is FilteredProductsProvider && other.pageKey == pageKey;
+    return other is PaginatedProductsProvider && other.page == page;
   }
 
   @override
   int get hashCode {
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, pageKey.hashCode);
+    hash = _SystemHash.combine(hash, page.hashCode);
 
     return _SystemHash.finish(hash);
   }
@@ -145,18 +149,19 @@ class FilteredProductsProvider
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-mixin FilteredProductsRef on AutoDisposeFutureProviderRef<List<ProductModel>> {
-  /// The parameter `pageKey` of this provider.
-  int get pageKey;
+mixin PaginatedProductsRef
+    on AutoDisposeFutureProviderRef<PaginatedResponse<ProductModel>> {
+  /// The parameter `page` of this provider.
+  int get page;
 }
 
-class _FilteredProductsProviderElement
-    extends AutoDisposeFutureProviderElement<List<ProductModel>>
-    with FilteredProductsRef {
-  _FilteredProductsProviderElement(super.provider);
+class _PaginatedProductsProviderElement
+    extends AutoDisposeFutureProviderElement<PaginatedResponse<ProductModel>>
+    with PaginatedProductsRef {
+  _PaginatedProductsProviderElement(super.provider);
 
   @override
-  int get pageKey => (origin as FilteredProductsProvider).pageKey;
+  int get page => (origin as PaginatedProductsProvider).page;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

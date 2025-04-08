@@ -5,10 +5,14 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'products_provider.g.dart';
 
-// Provider that exposes the products from the repository
-@riverpod
+/// Provides the full, unfiltered list of all products.
+///
+/// This provider fetches the entire product dataset from the [ProductsRepository].
+/// It serves as the base data source for filtering and pagination.
+@Riverpod(keepAlive: true)
 Future<List<ProductModel>> products(Ref ref) async {
-  // Use the repository provider from the data layer
+  // This provider fetches all products from the products repository
   final repository = ref.watch(productsRepositoryProvider);
-  return repository.fetchProducts();
+  final allProducts = await repository.fetchProducts();
+  return allProducts;
 }
