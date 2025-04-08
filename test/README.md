@@ -21,11 +21,10 @@ To run all tests:
 
 ```bash
 flutter test
-```
+
 
 To run a specific test file:
 
-```bash
 flutter test test/unit/product_filter_notifier_test.dart
 ```
 
