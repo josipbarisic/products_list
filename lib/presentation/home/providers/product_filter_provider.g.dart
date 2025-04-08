@@ -7,9 +7,14 @@ part of 'product_filter_provider.dart';
 // **************************************************************************
 
 String _$productFilterNotifierHash() =>
-    r'97a591736a1b32c3b2e07b6c3cee3222356b46d4';
+    r'56a9cac8f4065b1b599399bcc15415f1a3092b80';
 
-/// See also [ProductFilterNotifier].
+/// Provides the current filter state ([ProductFilter]) for products.
+///
+/// This notifier holds the user-selected filters (search query, brand, etc.)
+/// and includes debouncing logic for the search query.
+///
+/// Copied from [ProductFilterNotifier].
 @ProviderFor(ProductFilterNotifier)
 final productFilterNotifierProvider =
     NotifierProvider<ProductFilterNotifier, ProductFilter>.internal(

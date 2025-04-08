@@ -3,7 +3,7 @@ import 'dart:developer';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:italist_mobile_assignment/core/services/local_storage_service.dart';
+import 'package:italist_mobile_assignment/core/services/local_storage/local_storage_service.dart';
 import 'package:italist_mobile_assignment/data/models/product/product_model.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -12,7 +12,7 @@ part 'products_repository.g.dart';
 /// ------------------------ PRODUCTS REPOSITORY PROVIDER ------------------------
 @Riverpod(keepAlive: true)
 ProductsRepository productsRepository(Ref ref) {
-  final localStorageService = LocalStorageService.getInstance();
+  final localStorageService = ref.read(localStorageServiceProvider);
   return ProductsRepository(localStorageService: localStorageService);
 }
 
@@ -33,7 +33,6 @@ class ProductsRepository {
       // First try to get data from cache
       final cachedProducts = await fetchCachedProducts();
       if (cachedProducts.isNotEmpty) {
-        log('Returning products from cache');
         return cachedProducts;
       }
 

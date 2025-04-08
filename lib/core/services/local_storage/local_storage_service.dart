@@ -2,6 +2,16 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'local_storage_service.g.dart';
+
+/// --------------------- LOCAL STORAGE SERVICE PROVIDER ---------------------
+@Riverpod(keepAlive: true)
+LocalStorageService localStorageService(Ref ref) => LocalStorageService();
+
+/// --------------------------------------------------------------------------
 
 class LocalStorageService {
   static const String _productsBoxName = 'products_box';
@@ -11,17 +21,7 @@ class LocalStorageService {
   // Cache duration - 24 hours
   static const Duration _cacheDuration = Duration(hours: 24);
 
-  static LocalStorageService? _instance;
   late Box _productsBox;
-
-  // Private constructor
-  LocalStorageService._();
-
-  // Singleton factory
-  static LocalStorageService getInstance() {
-    _instance ??= LocalStorageService._();
-    return _instance!;
-  }
 
   // Save products to local storage
   Future<void> saveProducts(List<Map<String, dynamic>> products) async {

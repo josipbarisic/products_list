@@ -6,7 +6,7 @@ part of 'paginated_products_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$paginatedProductsHash() => r'a31367ab9ad0b8268f7d74d017b61f2758f9d9d5';
+String _$paginatedProductsHash() => r'54c30767e490ebd155558964528524e47c588e64';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -29,17 +29,49 @@ class _SystemHash {
   }
 }
 
-/// See also [paginatedProducts].
+/// Provides a paginated list of products based on the current filters.
+///
+/// Takes the 1-based `page` number as an argument.
+/// Watches [productFilterNotifierProvider] to get the current filter criteria.
+/// Fetches the full product list from [productsProvider].
+/// Applies filtering and returns a [PaginatedResponse] containing the items
+/// for the requested page and pagination metadata (total items, total pages).
+///
+/// Copied from [paginatedProducts].
 @ProviderFor(paginatedProducts)
 const paginatedProductsProvider = PaginatedProductsFamily();
 
-/// See also [paginatedProducts].
+/// Provides a paginated list of products based on the current filters.
+///
+/// Takes the 1-based `page` number as an argument.
+/// Watches [productFilterNotifierProvider] to get the current filter criteria.
+/// Fetches the full product list from [productsProvider].
+/// Applies filtering and returns a [PaginatedResponse] containing the items
+/// for the requested page and pagination metadata (total items, total pages).
+///
+/// Copied from [paginatedProducts].
 class PaginatedProductsFamily
     extends Family<AsyncValue<PaginatedResponse<ProductModel>>> {
-  /// See also [paginatedProducts].
+  /// Provides a paginated list of products based on the current filters.
+  ///
+  /// Takes the 1-based `page` number as an argument.
+  /// Watches [productFilterNotifierProvider] to get the current filter criteria.
+  /// Fetches the full product list from [productsProvider].
+  /// Applies filtering and returns a [PaginatedResponse] containing the items
+  /// for the requested page and pagination metadata (total items, total pages).
+  ///
+  /// Copied from [paginatedProducts].
   const PaginatedProductsFamily();
 
-  /// See also [paginatedProducts].
+  /// Provides a paginated list of products based on the current filters.
+  ///
+  /// Takes the 1-based `page` number as an argument.
+  /// Watches [productFilterNotifierProvider] to get the current filter criteria.
+  /// Fetches the full product list from [productsProvider].
+  /// Applies filtering and returns a [PaginatedResponse] containing the items
+  /// for the requested page and pagination metadata (total items, total pages).
+  ///
+  /// Copied from [paginatedProducts].
   PaginatedProductsProvider call(
     int page,
   ) {
@@ -72,10 +104,26 @@ class PaginatedProductsFamily
   String? get name => r'paginatedProductsProvider';
 }
 
-/// See also [paginatedProducts].
+/// Provides a paginated list of products based on the current filters.
+///
+/// Takes the 1-based `page` number as an argument.
+/// Watches [productFilterNotifierProvider] to get the current filter criteria.
+/// Fetches the full product list from [productsProvider].
+/// Applies filtering and returns a [PaginatedResponse] containing the items
+/// for the requested page and pagination metadata (total items, total pages).
+///
+/// Copied from [paginatedProducts].
 class PaginatedProductsProvider
     extends AutoDisposeFutureProvider<PaginatedResponse<ProductModel>> {
-  /// See also [paginatedProducts].
+  /// Provides a paginated list of products based on the current filters.
+  ///
+  /// Takes the 1-based `page` number as an argument.
+  /// Watches [productFilterNotifierProvider] to get the current filter criteria.
+  /// Fetches the full product list from [productsProvider].
+  /// Applies filtering and returns a [PaginatedResponse] containing the items
+  /// for the requested page and pagination metadata (total items, total pages).
+  ///
+  /// Copied from [paginatedProducts].
   PaginatedProductsProvider(
     int page,
   ) : this._internal(
