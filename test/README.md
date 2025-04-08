@@ -22,7 +22,6 @@ To run all tests:
 ```bash
 flutter test
 
-
 To run a specific test file:
 
 flutter test test/unit/product_filter_notifier_test.dart
@@ -47,7 +46,10 @@ To generate test coverage reports:
 
 Make sure you have lcov installed. If not, run:
 ```bash
-brew install lcov```
+brew install lcov
+```
+
+Then run the following commands:
 
 ```bash
 flutter test --coverage
