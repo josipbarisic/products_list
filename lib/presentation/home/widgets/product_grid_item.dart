@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:italist_mobile_assignment/core/constants/colors.dart';
 import 'package:italist_mobile_assignment/data/models/product/product_model.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// A widget that displays a single product in a grid layout.
@@ -35,7 +37,7 @@ class ProductGridItem extends StatelessWidget {
     return Card(
       clipBehavior: Clip.antiAlias,
       elevation: 1,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
         onTap: () => launchUrl(Uri.parse(product.link)).catchError((e, st) {
           // Handle URL launch error
@@ -57,31 +59,26 @@ class ProductGridItem extends StatelessWidget {
               aspectRatio: 1 / 1.2,
               child: Container(
                 decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
                   color: Colors.white, // Placeholder color
                 ),
                 child: Image.network(
                   product.imageLink,
-                  fit: BoxFit.fitHeight,
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    // Show progress indicator while loading
-                    return Center(
-                      child: CircularProgressIndicator(
-                        value: loadingProgress.expectedTotalBytes != null
-                            ? loadingProgress.cumulativeBytesLoaded /
-                                loadingProgress.expectedTotalBytes!
-                            : null,
-                        strokeWidth: 2,
-                      ),
-                    );
-                  },
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      color: Colors.grey[300],
-                      child: Icon(Icons.broken_image, color: Colors.grey[400]),
-                    );
-                  },
+                  fit: BoxFit.scaleDown,
+                  loadingBuilder: (context, child, loadingProgress) => loadingProgress == null
+                      ? child
+                      : Shimmer.fromColors(
+                          baseColor: placeholderColor,
+                          highlightColor: Colors.white,
+                          child: Container(
+                            color: placeholderColor,
+                            child: Icon(Icons.broken_image, color: Colors.grey),
+                          ),
+                        ),
+                  errorBuilder: (context, error, stackTrace) => Container(
+                    color: placeholderColor,
+                    child: Icon(Icons.broken_image, color: Colors.grey[400]),
+                  ),
                 ),
               ),
             ),
