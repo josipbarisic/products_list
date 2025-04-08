@@ -20,11 +20,14 @@ Unit tests focus on testing individual components in isolation:
 To run all tests:
 
 ```bash
-flutter test```
+flutter test
+```
 
 To run a specific test file:
 
-```flutter test test/unit/product_filter_notifier_test.dart```
+```bash
+flutter test test/unit/product_filter_notifier_test.dart
+```
 
 ## Test Utilities
 
