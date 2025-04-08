@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:italist_mobile_assignment/data/models/product/product_model.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+/// A widget that displays a single product in a grid layout.
+///
+/// Shows the product image, brand, title, and price.
+/// Tapping the item attempts to launch the product's URL.
 class ProductGridItem extends StatelessWidget {
+  /// The product data to display.
   final ProductModel product;
 
   const ProductGridItem({
@@ -10,12 +15,16 @@ class ProductGridItem extends StatelessWidget {
     required this.product,
   });
 
-  // Helper to parse price string
+  /// Formats a price string (e.g., "150.00 USD") into a displayable currency format (e.g., "$150.00").
+  ///
+  /// Returns the original string if parsing fails.
   String _formatPrice(String priceString) {
-    // Keep only digits and the first dot, and prefix with currency if needed
-    final cleaned = priceString.replaceAll(RegExp(r'[^\d.]'), '');
-    // Re-add currency symbol or format as needed
-    return '\$${double.tryParse(cleaned)?.toStringAsFixed(2) ?? priceString}';
+    // Remove non-numeric characters except the decimal point.
+    final cleanedPrice = priceString.replaceAll(RegExp(r'[^\d.]'), '');
+    final priceValue = double.tryParse(cleanedPrice);
+    return priceValue != null
+        ? '\$${priceValue.toStringAsFixed(2)}'
+        : priceString; // Format to 2 decimal places, Return original string as fallback
   }
 
   @override
@@ -24,17 +33,28 @@ class ProductGridItem extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Card(
-      clipBehavior: Clip.antiAlias, // Clip the image to the card shape
+      clipBehavior: Clip.antiAlias,
       elevation: 1,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       child: InkWell(
-        onTap: () => launchUrl(Uri.parse(product.link)),
+        onTap: () => launchUrl(Uri.parse(product.link)).catchError((e, st) {
+          // Handle URL launch error
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Failed to open the product link. Please try again.'),
+                duration: const Duration(seconds: 2),
+              ),
+            );
+          }
+          return false;
+        }),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Image Section
             AspectRatio(
-              aspectRatio: 1 / 1.2, // Adjust aspect ratio for image display
+              aspectRatio: 1 / 1.2,
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
@@ -45,6 +65,7 @@ class ProductGridItem extends StatelessWidget {
                   fit: BoxFit.fitHeight,
                   loadingBuilder: (context, child, loadingProgress) {
                     if (loadingProgress == null) return child;
+                    // Show progress indicator while loading
                     return Center(
                       child: CircularProgressIndicator(
                         value: loadingProgress.expectedTotalBytes != null

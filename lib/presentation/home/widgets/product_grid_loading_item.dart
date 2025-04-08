@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:italist_mobile_assignment/core/constants/colors.dart';
 
+/// A placeholder widget displayed in the product grid while product data is loading.
+///
+/// Shows grey boxes approximating the layout of a [ProductGridItem].
 class ProductGridLoadingItem extends StatelessWidget {
+  /// Creates a loading placeholder for the product grid.
   const ProductGridLoadingItem({super.key});
 
   @override
@@ -12,10 +17,15 @@ class ProductGridLoadingItem extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Image Placeholder
-          AspectRatio(
+          const AspectRatio(
             aspectRatio: 1 / 1.2,
-            child: Container(
-              color: Colors.grey[300], // Placeholder color
+            child: DecoratedBox(
+              // Use DecoratedBox for const background color
+              decoration: BoxDecoration(
+                color: placeholderColor, // Placeholder color
+                // Consider matching corner radius if ProductGridItem clips image
+                // borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
+              ),
             ),
           ),
           // Text Placeholders
@@ -24,13 +34,25 @@ class ProductGridLoadingItem extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(height: 10, width: 50, color: Colors.grey[300]),
+                const DecoratedBox(
+                  decoration: BoxDecoration(color: placeholderColor),
+                  child: SizedBox(height: 10, width: 50),
+                ),
                 const SizedBox(height: 4),
-                Container(height: 12, width: double.infinity, color: Colors.grey[300]),
+                const DecoratedBox(
+                  decoration: BoxDecoration(color: placeholderColor),
+                  child: SizedBox(height: 12, width: double.infinity),
+                ),
                 const SizedBox(height: 2),
-                Container(height: 12, width: 100, color: Colors.grey[300]),
+                const DecoratedBox(
+                  decoration: BoxDecoration(color: placeholderColor),
+                  child: SizedBox(height: 12, width: 100),
+                ),
                 const SizedBox(height: 6),
-                Container(height: 14, width: 70, color: Colors.grey[300]),
+                const DecoratedBox(
+                  decoration: BoxDecoration(color: placeholderColor),
+                  child: SizedBox(height: 14, width: 70),
+                ),
               ],
             ),
           ),
@@ -38,4 +60,4 @@ class ProductGridLoadingItem extends StatelessWidget {
       ),
     );
   }
-} 
+}

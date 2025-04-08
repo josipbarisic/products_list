@@ -3,6 +3,11 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:italist_mobile_assignment/presentation/home/providers/product_filter_provider.dart';
 import 'package:italist_mobile_assignment/presentation/home/widgets/custom_filter_chip.dart';
 
+/// A horizontal row displaying currently active filters as chips.
+///
+/// Shows chips for brand, category, gender, and price range if they are set.
+/// Also displays a 'Clear All' button if any filters are active.
+/// Returns an empty widget if no filters are active.
 class FilterChips extends HookConsumerWidget {
   const FilterChips({super.key});
 
@@ -15,6 +20,7 @@ class FilterChips extends HookConsumerWidget {
         filter.minPrice != null ||
         filter.maxPrice != null;
 
+    // Return empty if no filters are active
     if (!hasActiveFilters) {
       return const SizedBox.shrink();
     }

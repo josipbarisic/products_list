@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 
 class CustomFilterChip extends StatelessWidget {
@@ -18,10 +16,7 @@ class CustomFilterChip extends StatelessWidget {
         child: Chip(
           label: Text(label),
           deleteIcon: const Icon(Icons.close, size: 16),
-          onDeleted: () {
-            log('Removing filter: $label');
-            onRemove();
-          },
+          onDeleted: onRemove,
         ),
       );
 }

@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+/// A customizable choice chip used for filtering options.
+///
+/// Wraps Flutter's [FilterChip] widget, providing a consistent appearance
+/// for filter selections.
 class FilterChoice extends StatelessWidget {
   final String label;
   final bool isSelected;

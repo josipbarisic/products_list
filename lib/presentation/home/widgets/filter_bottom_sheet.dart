@@ -4,6 +4,9 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:italist_mobile_assignment/presentation/home/providers/product_filter_provider.dart';
 import 'package:italist_mobile_assignment/presentation/home/widgets/filter_choice.dart';
 
+/// A bottom sheet widget for filtering products based on various criteria.
+///
+/// Allows filtering by brand, category, gender, and price range.
 class FilterBottomSheet extends HookConsumerWidget {
   const FilterBottomSheet({super.key});
 
@@ -11,7 +14,7 @@ class FilterBottomSheet extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final filter = ref.watch(productFilterNotifierProvider);
 
-    // List of available brands, categories, and genders. This would normally come from an endpoint.
+    // List of available brands, categories, and genders (you would typically get this from data)
     final brands = ['Lo Decor', 'Michael Kors', 'Nike', 'Adidas', 'Gucci', 'Lo Spazio Jewelry', 'Calvin Klein'];
     final categories = ['Home Décor', 'Accessories', 'Clothing', 'Shoes', 'Bags'];
     final genders = ['male', 'female', 'unisex'];
