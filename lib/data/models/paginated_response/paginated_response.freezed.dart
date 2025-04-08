@@ -17,6 +17,7 @@ final _privateConstructorUsedError = UnsupportedError(
 /// @nodoc
 mixin _$PaginatedResponse<T> {
   List<T> get items => throw _privateConstructorUsedError;
+  int get loadedItems => throw _privateConstructorUsedError;
   int get totalItems => throw _privateConstructorUsedError;
   int get totalPages => throw _privateConstructorUsedError;
   int get currentPage => throw _privateConstructorUsedError;
@@ -34,7 +35,12 @@ abstract class $PaginatedResponseCopyWith<T, $Res> {
           $Res Function(PaginatedResponse<T>) then) =
       _$PaginatedResponseCopyWithImpl<T, $Res, PaginatedResponse<T>>;
   @useResult
-  $Res call({List<T> items, int totalItems, int totalPages, int currentPage});
+  $Res call(
+      {List<T> items,
+      int loadedItems,
+      int totalItems,
+      int totalPages,
+      int currentPage});
 }
 
 /// @nodoc
@@ -54,6 +60,7 @@ class _$PaginatedResponseCopyWithImpl<T, $Res,
   @override
   $Res call({
     Object? items = null,
+    Object? loadedItems = null,
     Object? totalItems = null,
     Object? totalPages = null,
     Object? currentPage = null,
@@ -63,6 +70,10 @@ class _$PaginatedResponseCopyWithImpl<T, $Res,
           ? _value.items
           : items // ignore: cast_nullable_to_non_nullable
               as List<T>,
+      loadedItems: null == loadedItems
+          ? _value.loadedItems
+          : loadedItems // ignore: cast_nullable_to_non_nullable
+              as int,
       totalItems: null == totalItems
           ? _value.totalItems
           : totalItems // ignore: cast_nullable_to_non_nullable
@@ -87,7 +98,12 @@ abstract class _$$PaginatedResponseImplCopyWith<T, $Res>
       __$$PaginatedResponseImplCopyWithImpl<T, $Res>;
   @override
   @useResult
-  $Res call({List<T> items, int totalItems, int totalPages, int currentPage});
+  $Res call(
+      {List<T> items,
+      int loadedItems,
+      int totalItems,
+      int totalPages,
+      int currentPage});
 }
 
 /// @nodoc
@@ -104,6 +120,7 @@ class __$$PaginatedResponseImplCopyWithImpl<T, $Res>
   @override
   $Res call({
     Object? items = null,
+    Object? loadedItems = null,
     Object? totalItems = null,
     Object? totalPages = null,
     Object? currentPage = null,
@@ -113,6 +130,10 @@ class __$$PaginatedResponseImplCopyWithImpl<T, $Res>
           ? _value._items
           : items // ignore: cast_nullable_to_non_nullable
               as List<T>,
+      loadedItems: null == loadedItems
+          ? _value.loadedItems
+          : loadedItems // ignore: cast_nullable_to_non_nullable
+              as int,
       totalItems: null == totalItems
           ? _value.totalItems
           : totalItems // ignore: cast_nullable_to_non_nullable
@@ -134,6 +155,7 @@ class __$$PaginatedResponseImplCopyWithImpl<T, $Res>
 class _$PaginatedResponseImpl<T> implements _PaginatedResponse<T> {
   const _$PaginatedResponseImpl(
       {required final List<T> items,
+      required this.loadedItems,
       required this.totalItems,
       required this.totalPages,
       required this.currentPage})
@@ -148,6 +170,8 @@ class _$PaginatedResponseImpl<T> implements _PaginatedResponse<T> {
   }
 
   @override
+  final int loadedItems;
+  @override
   final int totalItems;
   @override
   final int totalPages;
@@ -156,7 +180,7 @@ class _$PaginatedResponseImpl<T> implements _PaginatedResponse<T> {
 
   @override
   String toString() {
-    return 'PaginatedResponse<$T>(items: $items, totalItems: $totalItems, totalPages: $totalPages, currentPage: $currentPage)';
+    return 'PaginatedResponse<$T>(items: $items, loadedItems: $loadedItems, totalItems: $totalItems, totalPages: $totalPages, currentPage: $currentPage)';
   }
 
   @override
@@ -165,6 +189,8 @@ class _$PaginatedResponseImpl<T> implements _PaginatedResponse<T> {
         (other.runtimeType == runtimeType &&
             other is _$PaginatedResponseImpl<T> &&
             const DeepCollectionEquality().equals(other._items, _items) &&
+            (identical(other.loadedItems, loadedItems) ||
+                other.loadedItems == loadedItems) &&
             (identical(other.totalItems, totalItems) ||
                 other.totalItems == totalItems) &&
             (identical(other.totalPages, totalPages) ||
@@ -177,6 +203,7 @@ class _$PaginatedResponseImpl<T> implements _PaginatedResponse<T> {
   int get hashCode => Object.hash(
       runtimeType,
       const DeepCollectionEquality().hash(_items),
+      loadedItems,
       totalItems,
       totalPages,
       currentPage);
@@ -195,12 +222,15 @@ class _$PaginatedResponseImpl<T> implements _PaginatedResponse<T> {
 abstract class _PaginatedResponse<T> implements PaginatedResponse<T> {
   const factory _PaginatedResponse(
       {required final List<T> items,
+      required final int loadedItems,
       required final int totalItems,
       required final int totalPages,
       required final int currentPage}) = _$PaginatedResponseImpl<T>;
 
   @override
   List<T> get items;
+  @override
+  int get loadedItems;
   @override
   int get totalItems;
   @override

@@ -9,7 +9,7 @@ part of 'local_storage_service.dart';
 String _$localStorageServiceHash() =>
     r'6009aa818e95c9c1fc8fbf24de965b0b9d0b3951';
 
-/// ------------------------ NETWORK SERVICE PROVIDER ------------------------
+/// --------------------- LOCAL STORAGE SERVICE PROVIDER ---------------------
 ///
 /// Copied from [localStorageService].
 @ProviderFor(localStorageService)

@@ -1,1 +1,0 @@
-const String kBaseUrl = 'https://api.example.com';

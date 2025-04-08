@@ -6,6 +6,7 @@ part 'paginated_response.freezed.dart';
 class PaginatedResponse<T> with _$PaginatedResponse<T> {
   const factory PaginatedResponse({
     required List<T> items,
+    required int loadedItems,
     required int totalItems,
     required int totalPages,
     required int currentPage,

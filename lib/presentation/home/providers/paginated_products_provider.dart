@@ -83,7 +83,7 @@ Future<PaginatedResponse<ProductModel>> paginatedProducts(Ref ref, int page) asy
   // Calculate pagination details
   final totalItems = filteredProducts.length;
   final totalPages = (totalItems / _pageSize).ceil();
-  final startIndex = (page - 1) * _pageSize; 
+  final startIndex = (page - 1) * _pageSize;
 
   // Get the items for the current page
   List<ProductModel> pageItems = [];
@@ -95,15 +95,19 @@ Future<PaginatedResponse<ProductModel>> paginatedProducts(Ref ref, int page) asy
     );
   }
 
+  final loadedItems = page == 0 ? pageItems.length : (_pageSize * page) + pageItems.length;
+
   // Add artificial delay for subsequent pages
   if (page > 1) {
     log('paginatedProducts: Adding artificial delay for page $page');
     await Future.delayed(const Duration(seconds: 1));
   }
 
+  log('PAGINATED RESPONSE FOR PAGE items: ${pageItems.length} :: loadedItems: $loadedItems totalItems: $totalItems totalPages: $totalPages currentPage: $page');
   // Return the paginated response
   return PaginatedResponse(
     items: pageItems,
+    loadedItems: loadedItems,
     totalItems: totalItems,
     totalPages: totalPages,
     currentPage: page,

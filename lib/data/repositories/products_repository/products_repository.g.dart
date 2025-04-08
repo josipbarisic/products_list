@@ -7,7 +7,7 @@ part of 'products_repository.dart';
 // **************************************************************************
 
 String _$productsRepositoryHash() =>
-    r'6cbb84ec5c4f7407ae355fb085da5f1f18e9851a';
+    r'ac7f2002990f970bbd14ddc16740786a78e60061';
 
 /// ------------------------ PRODUCTS REPOSITORY PROVIDER ------------------------
 ///
