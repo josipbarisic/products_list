@@ -1,11 +1,16 @@
+import 'dart:async'; // Import dart:async for Timer
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
+import 'package:italist_mobile_assignment/data/models/product/product_model.dart';
 import 'package:italist_mobile_assignment/presentation/home/providers/filtered_products_provider.dart';
 import 'package:italist_mobile_assignment/presentation/home/providers/product_filter_provider.dart';
-import 'package:italist_mobile_assignment/presentation/widgets/product_list_item.dart';
+import 'package:italist_mobile_assignment/presentation/home/widgets/filter_bottom_sheet.dart';
+import 'package:italist_mobile_assignment/presentation/home/widgets/filter_chips.dart';
+import 'package:italist_mobile_assignment/presentation/home/widgets/product_list_item.dart';
 
 class HomePage extends HookConsumerWidget {
   const HomePage({super.key});
@@ -13,8 +18,27 @@ class HomePage extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final searchController = useTextEditingController();
+    final debounceTimer = useState<Timer?>(null);
+    final pagingController = useMemoized(
+      () => PagingController<int, ProductModel>(
+        getNextPageKey: (state) {
+          log('PAGING CONTROLLER: getNextPageKey called with state: ${state.keys} and hasNextPage: ${state.hasNextPage} and pageKey: ${state.keys?.last} and status: ${state.status}');
+          return (state.keys?.last ?? -1) + 1;
+        },
+        fetchPage: (pageKey) {
+          log('PAGING CONTROLLER: fetchPage called with pageKey: $pageKey');
+          return ref.read(filteredProductsProvider(pageKey).future);
+        },
+      ),
+      [],
+    );
 
-    // Listen to search text changes and update filter
+    // Effect to cancel the timer when the widget is disposed
+    useEffect(() {
+      return () => debounceTimer.value?.cancel();
+    }, []); // Empty dependency array ensures cleanup runs only on unmount
+
+    // Listen to search text changes and update filter ONLY
     useEffect(() {
       void updateSearch() {
         ref.read(productFilterNotifierProvider.notifier).updateSearchQuery(searchController.text);
@@ -23,6 +47,35 @@ class HomePage extends HookConsumerWidget {
       searchController.addListener(updateSearch);
       return () => searchController.removeListener(updateSearch);
     }, [searchController]);
+
+    // Listen to filter changes (excluding pagination) and refresh the controller with debounce
+    ref.listen(productFilterNotifierProvider, (prev, next) {
+      final bool filtersChanged = prev?.searchQuery != next.searchQuery ||
+          prev?.brand != next.brand ||
+          prev?.category != next.category ||
+          prev?.gender != next.gender ||
+          prev?.minPrice != next.minPrice ||
+          prev?.maxPrice != next.maxPrice;
+
+      // Refresh only if core filters changed
+      if (filtersChanged) {
+        log('PAGING CONTROLLER: Filters changed, debouncing refresh.');
+        debounceTimer.value?.cancel();
+        debounceTimer.value = Timer(const Duration(milliseconds: 1000), () {
+          log('PAGING CONTROLLER: Debounce finished, refreshing.');
+          pagingController.refresh();
+        });
+      }
+    });
+
+    // Cleanup PagingController on dispose
+    useEffect(() {
+        log('PAGING CONTROLLER: Setting up dispose effect.');
+        return () {
+             log('PAGING CONTROLLER: Disposing controller.');
+             pagingController.dispose();
+        };
+    }, [pagingController]);
 
     return Scaffold(
       appBar: AppBar(
@@ -53,26 +106,27 @@ class HomePage extends HookConsumerWidget {
           ),
           const FilterChips(),
           Expanded(
-            child: ref.watch(filteredProductsProvider).when(
-                  data: (products) => products.isEmpty
-                      ? const Center(
-                          child: Text('No products found'),
-                        )
-                      : ListView.builder(
-                          itemCount: products.length,
-                          itemBuilder: (context, index) =>
-                              ProductListItem(product: products[index]),
-                        ),
-                  loading: () => const Center(
+            // Use PagingListener + PagedListView as per example
+            child: PagingListener(
+              controller: pagingController,
+              builder: (context, state, fetchNextPage) => PagedListView<int, ProductModel>(
+                state: state,
+                fetchNextPage: fetchNextPage,
+                builderDelegate: PagedChildBuilderDelegate<ProductModel>(
+                  itemBuilder: (context, item, index) => ProductListItem(product: item),
+                  firstPageProgressIndicatorBuilder: (_) => const Center(
                     child: CircularProgressIndicator(),
                   ),
-                  error: (error, stackTrace) {
-                    log('Error: $error');
-                    return Center(
-                      child: Text('Error: $error'),
-                    );
-                  },
+                  newPageProgressIndicatorBuilder: (_) => const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                  noItemsFoundIndicatorBuilder: (_) => const Center(
+                    child: Text('No products found'),
+                  ),
+                  noMoreItemsIndicatorBuilder: (_) => const SizedBox.shrink(),
                 ),
+              ),
+            ),
           ),
         ],
       ),
@@ -84,263 +138,6 @@ class HomePage extends HookConsumerWidget {
       context: context,
       isScrollControlled: true,
       builder: (context) => const FilterBottomSheet(),
-    );
-  }
-}
-
-class FilterChips extends HookConsumerWidget {
-  const FilterChips({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final filter = ref.watch(productFilterNotifierProvider);
-    final hasActiveFilters = filter.brand != null ||
-        filter.category != null ||
-        filter.gender != null ||
-        filter.minPrice != null ||
-        filter.maxPrice != null;
-
-    if (!hasActiveFilters) {
-      return const SizedBox.shrink();
-    }
-
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-        child: Row(
-          children: [
-            if (hasActiveFilters)
-              Padding(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    ref.read(productFilterNotifierProvider.notifier).clearFilters();
-                  },
-                  icon: const Icon(Icons.clear_all),
-                  label: const Text('Clear All'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red.shade100,
-                    foregroundColor: Colors.red.shade900,
-                  ),
-                ),
-              ),
-            if (filter.brand != null)
-              _buildFilterChip(
-                context,
-                'Brand: ${filter.brand}',
-                () => ref.read(productFilterNotifierProvider.notifier).updateBrand(null),
-              ),
-            if (filter.category != null)
-              _buildFilterChip(
-                context,
-                'Category: ${filter.category}',
-                () => ref.read(productFilterNotifierProvider.notifier).updateCategory(null),
-              ),
-            if (filter.gender != null)
-              _buildFilterChip(
-                context,
-                'Gender: ${filter.gender}',
-                () => ref.read(productFilterNotifierProvider.notifier).updateGender(null),
-              ),
-            if (filter.minPrice != null || filter.maxPrice != null)
-              _buildFilterChip(
-                context,
-                'Price: ${filter.minPrice != null ? '\$${filter.minPrice}' : ''}${(filter.minPrice != null && filter.maxPrice != null) ? ' - ' : ''}${filter.maxPrice != null ? '\$${filter.maxPrice}' : ''}',
-                () => ref.read(productFilterNotifierProvider.notifier).updatePriceRange(null, null),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFilterChip(BuildContext context, String label, VoidCallback onRemove) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
-      child: Chip(
-        label: Text(label),
-        deleteIcon: const Icon(Icons.close, size: 16),
-        onDeleted: onRemove,
-      ),
-    );
-  }
-}
-
-class FilterBottomSheet extends HookConsumerWidget {
-  const FilterBottomSheet({super.key});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final filter = ref.watch(productFilterNotifierProvider);
-
-    // List of available brands, categories, and genders (you would typically get this from data)
-    final brands = ['Lo Decor', 'Michael Kors', 'Nike', 'Adidas', 'Gucci', 'Prada'];
-    final categories = ['Home Décor', 'Accessories', 'Clothing', 'Shoes', 'Bags'];
-    final genders = ['male', 'female', 'unisex'];
-
-    final selectedBrand = useState<String?>(filter.brand);
-    final selectedCategory = useState<String?>(filter.category);
-    final selectedGender = useState<String?>(filter.gender);
-    final priceRange = useState<RangeValues>(RangeValues(
-      filter.minPrice ?? 0,
-      filter.maxPrice ?? 1000,
-    ));
-
-    return DraggableScrollableSheet(
-      initialChildSize: 0.7,
-      maxChildSize: 0.9,
-      minChildSize: 0.5,
-      expand: false,
-      builder: (context, scrollController) {
-        return Container(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text(
-                    'Filter Products',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Expanded(
-                child: ListView(
-                  controller: scrollController,
-                  children: [
-                    const Text('Brand', style: TextStyle(fontWeight: FontWeight.bold)),
-                    Wrap(
-                      spacing: 8.0,
-                      children: brands
-                          .map((brand) => FilterChoice(
-                                label: brand,
-                                isSelected: brand == selectedBrand.value,
-                                onSelected: (selected) {
-                                  selectedBrand.value = selected ? brand : null;
-                                },
-                              ))
-                          .toList(),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text('Category', style: TextStyle(fontWeight: FontWeight.bold)),
-                    Wrap(
-                      spacing: 8.0,
-                      children: categories
-                          .map((category) => FilterChoice(
-                                label: category,
-                                isSelected: category == selectedCategory.value,
-                                onSelected: (selected) {
-                                  selectedCategory.value = selected ? category : null;
-                                },
-                              ))
-                          .toList(),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text('Gender', style: TextStyle(fontWeight: FontWeight.bold)),
-                    Wrap(
-                      spacing: 8.0,
-                      children: genders
-                          .map((gender) => FilterChoice(
-                                label: gender,
-                                isSelected: gender == selectedGender.value,
-                                onSelected: (selected) {
-                                  selectedGender.value = selected ? gender : null;
-                                },
-                              ))
-                          .toList(),
-                    ),
-                    const SizedBox(height: 16),
-                    const Text('Price Range', style: TextStyle(fontWeight: FontWeight.bold)),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('\$${priceRange.value.start.toInt()}'),
-                        Text('\$${priceRange.value.end.toInt()}'),
-                      ],
-                    ),
-                    RangeSlider(
-                      values: priceRange.value,
-                      min: 0,
-                      max: 1000,
-                      divisions: 100,
-                      onChanged: (values) {
-                        priceRange.value = values;
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () {
-                        ref.read(productFilterNotifierProvider.notifier).clearFilters();
-                        Navigator.pop(context);
-                      },
-                      child: const Text('Reset'),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: FilledButton(
-                      onPressed: () {
-                        // Apply all filters
-                        ref.read(productFilterNotifierProvider.notifier)
-                          ..updateBrand(selectedBrand.value)
-                          ..updateCategory(selectedCategory.value)
-                          ..updateGender(selectedGender.value)
-                          ..updatePriceRange(
-                            priceRange.value.start > 0 ? priceRange.value.start : null,
-                            priceRange.value.end < 1000 ? priceRange.value.end : null,
-                          );
-                        Navigator.pop(context);
-                      },
-                      child: const Text('Apply'),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-}
-
-class FilterChoice extends StatelessWidget {
-  final String label;
-  final bool isSelected;
-  final Function(bool) onSelected;
-
-  const FilterChoice({
-    super.key,
-    required this.label,
-    required this.isSelected,
-    required this.onSelected,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return FilterChip(
-      label: Text(label),
-      selected: isSelected,
-      onSelected: onSelected,
-      checkmarkColor: Theme.of(context).colorScheme.primary,
-      selectedColor: Theme.of(context).colorScheme.primaryContainer,
     );
   }
 }

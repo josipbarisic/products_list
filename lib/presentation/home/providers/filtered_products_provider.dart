@@ -10,20 +10,41 @@ part 'filtered_products_provider.g.dart';
 
 // Filtered products provider
 @riverpod
-Future<List<ProductModel>> filteredProducts(Ref ref) async {
+Future<List<ProductModel>> filteredProducts(Ref ref, int pageKey) async {
   final filter = ref.watch(productFilterNotifierProvider);
   final products = await ref.watch(productsProvider.future);
 
-  return products.where((product) {
+  log('Fetching filtered products for page: $pageKey because of filter: ${filter.toJson()} and products: ${products.length}');
+
+  final filteredProducts = products.where((product) {
+    bool matches = true; // Assume match initially
+
     // Apply search query filter
     if (filter.searchQuery.isNotEmpty) {
-      final query = filter.searchQuery.toLowerCase();
-      if (!product.title.toLowerCase().contains(query) &&
-          !product.brand.toLowerCase().contains(query) &&
-          !product.description.toLowerCase().contains(query)) {
-        return false;
+      final query = filter.searchQuery.trim().toLowerCase(); // Added trim()
+      if (query.isNotEmpty) { // Check if query is not empty after trimming
+        final titleLower = product.title.toLowerCase();
+        final brandLower = product.brand.toLowerCase();
+        final descriptionLower = product.description.toLowerCase();
+
+        final titleMatch = titleLower.contains(query);
+        final brandMatch = brandLower.contains(query);
+        final descriptionMatch = descriptionLower.contains(query);
+
+        // Logging for debugging search
+        if (titleLower.contains('classic') || brandLower.contains('classic') || descriptionLower.contains('classic')) {
+            log('Checking product ID: ${product.id}, Title: "$titleLower", Brand: "$brandLower", Desc: "$descriptionLower"');
+            log('Searching for: "$query"');
+            log('Matches: Title=$titleMatch, Brand=$brandMatch, Desc=$descriptionMatch');
+        }
+
+        if (!titleMatch && !brandMatch && !descriptionMatch) {
+          matches = false;
+        }
       }
     }
+
+    if (!matches) return false; // Early exit if search didn't match
 
     // Apply brand filter
     if (filter.brand != null && filter.brand!.isNotEmpty) {
@@ -61,10 +82,30 @@ Future<List<ProductModel>> filteredProducts(Ref ref) async {
           return false;
         }
       } catch (e) {
-        log('Error parsing price: $e');
+        log('Error parsing price: $e for product ID: ${product.id}');
+        // Decide how to handle parse errors - currently includes the item
       }
     }
 
-    return true;
+    return true; // Include if all filters passed
   }).toList();
+
+  log('Filtered products count: ${filteredProducts.length}');
+
+  // Calculate the start and end indices for the current page
+  final startIndex = pageKey * 20;
+  final endIndex = startIndex + 20;
+
+  // If we've reached the end of the list, return an empty list
+  if (startIndex >= filteredProducts.length) {
+    return [];
+  }
+
+  log('Start index: $startIndex, End index: $endIndex');
+
+  // Return the slice of products for the current page
+  return filteredProducts.sublist(
+    startIndex,
+    endIndex > filteredProducts.length ? filteredProducts.length : endIndex,
+  );
 }

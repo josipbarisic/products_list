@@ -16,21 +16,89 @@ class ProductFilter {
     this.maxPrice,
   });
 
-  ProductFilter copyWith({
-    String? searchQuery,
+  // to JSON
+  Map<String, dynamic> toJson() => {
+        'searchQuery': searchQuery,
+        'brand': brand,
+        'category': category,
+        'gender': gender,
+        'minPrice': minPrice,
+        'maxPrice': maxPrice,
+      };
+
+  ProductFilter copyWithSearchQuery(
+    String searchQuery,
+  ) =>
+      ProductFilter(
+        searchQuery: searchQuery,
+        brand: brand,
+        category: category,
+        gender: gender,
+        minPrice: minPrice,
+        maxPrice: maxPrice,
+      );
+
+  ProductFilter copyWithBrand(
     String? brand,
+  ) =>
+      ProductFilter(
+        searchQuery: searchQuery,
+        brand: brand,
+        category: category,
+        gender: gender,
+        minPrice: minPrice,
+        maxPrice: maxPrice,
+      );
+
+  ProductFilter copyWithCategory(
     String? category,
-    String? gender,
+  ) =>
+      ProductFilter(
+        searchQuery: searchQuery,
+        brand: brand,
+        category: category,
+        gender: gender,
+        minPrice: minPrice,
+        maxPrice: maxPrice,
+      );
+
+  ProductFilter copyWithGender(String? gender) => ProductFilter(
+        searchQuery: searchQuery,
+        brand: brand,
+        category: category,
+        gender: gender,
+        minPrice: minPrice,
+        maxPrice: maxPrice,
+      );
+
+  ProductFilter copyWithPriceRange({
     double? minPrice,
     double? maxPrice,
-  }) {
-    return ProductFilter(
-      searchQuery: searchQuery ?? this.searchQuery,
-      brand: brand ?? this.brand,
-      category: category ?? this.category,
-      gender: gender ?? this.gender,
-      minPrice: minPrice ?? this.minPrice,
-      maxPrice: maxPrice ?? this.maxPrice,
-    );
-  }
+  }) =>
+      ProductFilter(
+        searchQuery: searchQuery,
+        brand: brand,
+        category: category,
+        gender: gender,
+        minPrice: minPrice,
+        maxPrice: maxPrice,
+      );
+
+  ProductFilter copyWithPage(int page) => ProductFilter(
+        searchQuery: searchQuery,
+        brand: brand,
+        category: category,
+        gender: gender,
+        minPrice: minPrice,
+        maxPrice: maxPrice,
+      );
+
+  ProductFilter copyWithLimit(int limit) => ProductFilter(
+        searchQuery: searchQuery,
+        brand: brand,
+        category: category,
+        gender: gender,
+        minPrice: minPrice,
+        maxPrice: maxPrice,
+      );
 }

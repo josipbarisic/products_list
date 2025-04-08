@@ -39,40 +39,5 @@ class ProductModel with _$ProductModel {
     @JsonKey(name: 'additional_image_link_4') required String additionalImageLink4,
   }) = _ProductModel;
 
-  factory ProductModel.fromJson(Map<String, dynamic> json) =>
-      _$ProductModelFromJson(json);
+  factory ProductModel.fromJson(Map<String, dynamic> json) => _$ProductModelFromJson(json);
 }
-/*
-String _idFromJson(dynamic value) {
-  if (value == null) return '';
-  if (value is int) return value.toString();
-  if (value is String) return value;
-  return value.toString();
-}
-
-String _stringFromJson(dynamic value) {
-  if (value == null) return '';
-  return value.toString();
-}
-
-double _priceFromJson(dynamic value) {
-  if (value == null) return 0.0;
-  if (value is String) {
-    final parsed = double.tryParse(value);
-    return parsed ?? 0.0;
-  }
-  if (value is num) return value.toDouble();
-  return 0.0;
-}
-
-List<String> _imageLinksFromJson(dynamic value) {
-  final result = <String>[];
-
-  if (value == null) return result;
-
-  if (value is List) {
-    return value.map((item) => item.toString()).toList();
-  }
-
-  return result;
-}*/
